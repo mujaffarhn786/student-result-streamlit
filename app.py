@@ -1,18 +1,21 @@
-import pandas as pd
-from sklearn.linear_model import LogisticRegression
+iimport streamlit as st
+import numpy as np
 import pickle
 
-# Load dataset
-data = pd.read_csv("student_data.csv")
+model = pickle.load(open("student_model.pkl", "rb"))
 
-X = data[['StudyHours', 'Attendance', 'PreviousMarks']]
-y = data['Result']
+st.title("🎓 Student Result Prediction App")
 
-# Train model
-model = LogisticRegression()
-model.fit(X, y)
+study_hours = st.number_input("Study Hours per Day", 0.0, 24.0)
+attendance = st.number_input("Attendance (%)", 0.0, 100.0)
+previous_marks = st.number_input("Previous Marks (%)", 0.0, 100.0)
 
-# Save model
-pickle.dump(model, open("student_model.pkl", "wb"))
+if st.button("Predict"):
+    data = np.array([[study_hours, attendance, previous_marks]])
+    result = model.predict(data)
 
-print("Model trained and saved successfully!")
+    if result[0] == 1:
+        st.success("✅ Student is likely to PASS")
+    else:
+        st.error("❌ Student is likely to FAIL")
+
